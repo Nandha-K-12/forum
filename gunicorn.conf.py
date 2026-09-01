@@ -1,12 +1,14 @@
 """
 Gunicorn configuration for production deployment.
 """
+import os
 import multiprocessing
 
-bind = "127.0.0.1:8000"
-workers = multiprocessing.cpu_count() * 2 + 1
+port = os.environ.get("PORT", "8000")
+bind = f"0.0.0.0:{port}"
+workers = 2
 worker_class = "sync"
-timeout = 30
+timeout = 120
 keepalive = 2
 
 # Logging
