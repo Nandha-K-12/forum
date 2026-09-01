@@ -1,0 +1,102 @@
+{% extends 'boards/base.html' %}
+
+{% block title %}New Thread • {{ board.name }}{% endblock %}
+
+{% block content %}
+    <!-- Back / Cancel Navigation -->
+    <a href="{% url 'board_topics' board.id %}" class="d-inline-flex align-items-center gap-2 text-secondary text-decoration-none small fw-semibold mb-3">
+        <i class="bi bi-x-lg"></i>
+        <span>Cancel</span>
+    </a>
+
+    <!-- Compose Card -->
+    <div class="threads-card">
+        <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom border-secondary border-opacity-25">
+            <div class="threads-avatar" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                {{ board.name|slice:":1"|upper }}
+            </div>
+            <div>
+                <h2 class="h6 fw-bold mb-0">New Thread</h2>
+                <span class="badge rounded-pill bg-dark border border-secondary text-secondary px-2 py-1" style="font-size: 0.75rem;">
+                    Posting to {{ board.name }}
+                </span>
+            </div>
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2 px-3 mb-3 small" role="alert">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <!-- Subject Input -->
+            <div class="mb-3">
+                <label for="{{ form.subject.id_for_label }}" class="form-label text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.05em;">
+                    Subject
+                </label>
+                <input 
+                    type="text" 
+                    name="{{ form.subject.name }}" 
+                    id="{{ form.subject.id_for_label }}" 
+                    class="form-control form-control-threads {% if form.subject.errors %}is-invalid{% endif %}" 
+                    placeholder="Start a thread topic..."
+                    value="{{ form.subject.value|default_if_none:'' }}"
+                    required
+                    autocomplete="off"
+                >
+                {% if form.subject.errors %}
+                    <div class="invalid-feedback d-block small">
+                        {{ form.subject.errors|first }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Message Textarea -->
+            <div class="mb-4">
+                <label for="{{ form.message.id_for_label }}" class="form-label text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.05em;">
+                    Message
+                </label>
+                <textarea 
+                    name="{{ form.message.name }}" 
+                    id="{{ form.message.id_for_label }}" 
+                    class="form-control form-control-threads {% if form.message.errors %}is-invalid{% endif %}" 
+                    rows="5"
+                    placeholder="Say more... Share thoughts, context, or ask questions."
+                    required
+                >{{ form.message.value|default_if_none:'' }}</textarea>
+                {% if form.message.errors %}
+                    <div class="invalid-feedback d-block small">
+                        {{ form.message.errors|first }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Footer Action Toolbar & Submit -->
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top border-secondary border-opacity-25">
+                <div class="d-flex align-items-center gap-1 text-secondary">
+                    <button type="button" class="action-btn" title="Add image">
+                        <i class="bi bi-image fs-5"></i>
+                    </button>
+                    <button type="button" class="action-btn" title="Add poll">
+                        <i class="bi bi-bar-chart fs-5"></i>
+                    </button>
+                    <button type="button" class="action-btn" title="Add emoji">
+                        <i class="bi bi-emoji-smile fs-5"></i>
+                    </button>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{% url 'board_topics' board.id %}" class="btn-threads-secondary text-decoration-none">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn-threads-pill px-4">
+                        Post
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'boards/base.html' %}
+{% load humanize gravatar %}
+
+{% block title %}{{ board.name }} • Testpress{% endblock %}
+
+{% block content %}
+    <!-- Back Navigation / Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">
+                <a href="{% url 'home' %}" class="text-secondary text-decoration-none small">Boards</a>
+            </li>
+            <li class="breadcrumb-item active text-white small" aria-current="page">{{ board.name }}</li>
+        </ol>
+    </nav>
+
+    <!-- Board Hero Banner -->
+    <div class="threads-card mb-3" style="background: linear-gradient(180deg, #1d1d1d 0%, #151515 100%);">
+        <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+            <div>
+                <span class="badge rounded-pill bg-dark border border-secondary text-secondary px-2 py-1 mb-2">Channel</span>
+                <h1 class="h3 fw-bold mb-2">{{ board.name }}</h1>
+                <p class="text-secondary small mb-0">{{ board.description }}</p>
+            </div>
+            <div class="threads-avatar threads-avatar-lg" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                {{ board.name|slice:":1"|upper }}
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 pt-2 border-top border-secondary border-opacity-25">
+            <a href="{% url 'new_topic' board.id %}" class="btn-threads-pill d-inline-flex align-items-center gap-2 text-decoration-none">
+                <i class="bi bi-plus-lg"></i>
+                <span>New Thread</span>
+            </a>
+            <span class="badge rounded-pill bg-dark border border-secondary text-secondary px-3 py-2">
+                {{ board.topics.count }} thread{{ board.topics.count|pluralize }}
+            </span>
+            <span class="badge rounded-pill bg-dark border border-secondary text-secondary px-3 py-2">
+                {{ board.get_posts_count }} post{{ board.get_posts_count|pluralize }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Quick Compose Trigger -->
+    <a href="{% url 'new_topic' board.id %}" class="threads-card d-flex align-items-center justify-content-between text-decoration-none mb-3 py-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="threads-avatar" style="width: 34px; height: 34px; font-size: 0.85rem;">
+                <i class="bi bi-plus-lg"></i>
+            </div>
+            <span class="text-secondary small">Start a thread in {{ board.name }}...</span>
+        </div>
+        <span class="btn-threads-secondary py-1 px-3" style="font-size: 0.8rem; pointer-events: none;">Post</span>
+    </a>
+
+    <!-- Topics Thread Feed -->
+    <div class="d-flex flex-column gap-3">
+        {% for topic in topics %}
+            <article class="threads-card" style="cursor: pointer;" onclick="window.location='{% url 'topic_posts' board.id topic.id %}';">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="{{ topic.starter|gravatar }}" alt="{{ topic.starter.username|default:'user' }}" class="rounded-circle threads-avatar" style="object-fit: cover; width: 36px; height: 36px;">
+                        <div>
+                            <div class="fw-bold small d-flex align-items-center gap-1">
+                                {{ topic.starter.username|default:"member" }}
+                            </div>
+                            <small class="text-secondary" style="font-size: 0.78rem;">
+                                {{ topic.created_at|date:"M d, Y" }}
+                                <span class="mx-1">•</span>
+                                Last active {{ topic.last_updated|naturaltime }}
+                            </small>
+                        </div>
+                    </div>
+
+                    <span class="badge rounded-pill bg-dark border border-secondary text-secondary px-2 py-1" style="font-size: 0.75rem;">
+                        <i class="bi bi-eye me-1"></i>{{ topic.views }}
+                    </span>
+                </div>
+
+                <h2 class="h5 fw-bold mb-3 text-light">{{ topic.subject }}</h2>
+
+                <!-- Actions / Counters Bar -->
+                <div class="d-flex align-items-center justify-content-between pt-2 border-top border-secondary border-opacity-25">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="action-btn" onclick="event.stopPropagation(); this.classList.toggle('liked');" title="Like">
+                            <i class="bi bi-heart"></i>
+                        </button>
+
+                        <a href="{% url 'topic_posts' board.id topic.id %}" class="action-btn" onclick="event.stopPropagation();" title="Replies">
+                            <i class="bi bi-chat"></i>
+                            <span>{{ topic.replies|default:topic.posts.count }}</span>
+                        </a>
+
+                        <button class="action-btn" onclick="event.stopPropagation();" title="Repost">
+                            <i class="bi bi-repeat"></i>
+                        </button>
+
+                        <button class="action-btn" onclick="event.stopPropagation();" title="Share">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+
+                    {% with last_post=topic.posts.last %}
+                        {% if last_post %}
+                            <small class="text-secondary d-none d-sm-inline" style="font-size: 0.78rem;">
+                                Last by <strong class="text-white">{{ last_post.created_by.username }}</strong>
+                            </small>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </article>
+        {% empty %}
+            <div class="threads-card text-center py-5">
+                <i class="bi bi-chat-square-text text-secondary fs-1 mb-2"></i>
+                <h5 class="fw-bold">No threads yet</h5>
+                <p class="text-secondary small mb-3">Be the first to share your thoughts in {{ board.name }}.</p>
+                <a href="{% url 'new_topic' board.id %}" class="btn-threads-pill d-inline-flex align-items-center gap-2 text-decoration-none">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Start the first thread</span>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% include 'boards/includes/pagination.html' %}
+{% endblock %}

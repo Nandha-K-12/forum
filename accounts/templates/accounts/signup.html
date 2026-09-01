@@ -1,0 +1,107 @@
+{% extends 'boards/base.html' %}
+
+{% block title %}Sign Up • Testpress{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-center">
+        <div class="threads-card w-100" style="max-width: 480px;">
+            <!-- Header with Testpress Blue Icon -->
+            <div class="text-center mb-4 pt-2">
+                <svg viewBox="0 0 40 40" width="44" height="44" fill="none" class="mb-2">
+                    <path d="M 10 14.5 C 10 10.5 12.5 8 16.5 8 L 24.5 8 C 28.5 8 31 10.5 31 14.5 L 31 22.5 C 31 26.5 28.5 29 24.5 29" 
+                          stroke="#0066FF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+                    <rect x="7" y="21" width="9" height="9" rx="3.5" fill="#0066FF"/>
+                </svg>
+                <h1 class="h4 fw-bold text-white mb-1">Create an account</h1>
+                <p class="text-secondary small mb-0">Join the conversation on Testpress Forum</p>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2 px-3 mb-3 small" role="alert">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Username Field -->
+                <div class="mb-3">
+                    <label for="{{ form.username.id_for_label }}" class="form-label text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.05em;">
+                        Username
+                    </label>
+                    <input 
+                        type="text" 
+                        name="{{ form.username.name }}" 
+                        id="{{ form.username.id_for_label }}" 
+                        class="form-control form-control-threads {% if form.username.errors %}is-invalid{% endif %}" 
+                        placeholder="Choose a username"
+                        value="{{ form.username.value|default_if_none:'' }}"
+                        required
+                        autocomplete="username"
+                    >
+                    {% if form.username.errors %}
+                        <div class="invalid-feedback d-block small">
+                            {{ form.username.errors|first }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Email Field -->
+                <div class="mb-3">
+                    <label for="{{ form.email.id_for_label }}" class="form-label text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.05em;">
+                        Email Address
+                    </label>
+                    <input 
+                        type="email" 
+                        name="{{ form.email.name }}" 
+                        id="{{ form.email.id_for_label }}" 
+                        class="form-control form-control-threads {% if form.email.errors %}is-invalid{% endif %}" 
+                        placeholder="name@example.com"
+                        value="{{ form.email.value|default_if_none:'' }}"
+                        required
+                        autocomplete="email"
+                    >
+                    {% if form.email.errors %}
+                        <div class="invalid-feedback d-block small">
+                            {{ form.email.errors|first }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-4">
+                    <label for="{{ form.password.id_for_label }}" class="form-label text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.05em;">
+                        Password
+                    </label>
+                    <input 
+                        type="password" 
+                        name="{{ form.password.name }}" 
+                        id="{{ form.password.id_for_label }}" 
+                        class="form-control form-control-threads {% if form.password.errors %}is-invalid{% endif %}" 
+                        placeholder="Create a password"
+                        required
+                        autocomplete="new-password"
+                    >
+                    {% if form.password.errors %}
+                        <div class="invalid-feedback d-block small">
+                            {{ form.password.errors|first }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-threads-pill w-100 py-2 fs-6 mb-3">
+                    Sign Up
+                </button>
+
+                <!-- Footer Back / Sign in -->
+                <div class="text-center">
+                    <a href="{% url 'home' %}" class="text-secondary small text-decoration-none">
+                        Back to Home
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

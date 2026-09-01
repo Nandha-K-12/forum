@@ -1,0 +1,74 @@
+{% extends 'boards/base.html' %}
+
+{% block title %}Communities • Testpress{% endblock %}
+
+{% block content %}
+    <!-- Section Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h4 fw-bold mb-1 tracking-tight">Communities</h1>
+            <p class="text-secondary small mb-0">Discover spaces and join discussions</p>
+        </div>
+        <span class="badge rounded-pill bg-dark border border-secondary text-secondary px-3 py-2">
+            {{ boards|length }} Boards
+        </span>
+    </div>
+
+    <!-- Boards List Feed -->
+    <div class="d-flex flex-column gap-3">
+        {% for board in boards %}
+            <div class="threads-card" style="cursor: pointer;" onclick="window.location='{% url 'board_topics' board.id %}';">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="threads-avatar" style="background: linear-gradient(135deg, #2b5876 0%, #4e4376 100%);">
+                            {{ board.name|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <div class="fw-bold d-flex align-items-center gap-1">
+                                {{ board.name }}
+                                <i class="bi bi-patch-check-fill text-primary" style="font-size: 0.9rem;"></i>
+                            </div>
+                            <small class="text-secondary">
+                                {{ board.topics.count }} topic{{ board.topics.count|pluralize }} • {{ board.get_posts_count }} post{{ board.get_posts_count|pluralize }}
+                            </small>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'board_topics' board.id %}" class="btn-threads-secondary py-1 px-3" onclick="event.stopPropagation();">
+                        View
+                    </a>
+                </div>
+
+                <p class="text-light-emphasis mb-3" style="font-size: 0.95rem; line-height: 1.55;">
+                    {{ board.description }}
+                </p>
+
+                <!-- Footer with Last Post details -->
+                <div class="d-flex align-items-center justify-content-between pt-2 border-top border-secondary border-opacity-25">
+                    {% with last_post=board.get_last_post %}
+                        {% if last_post %}
+                            <small class="text-secondary" style="font-size: 0.8rem;">
+                                Latest by <strong class="text-white">{{ last_post.created_by.username }}</strong>
+                                <span class="mx-1">•</span>
+                                {{ last_post.created_at|timesince }} ago
+                            </small>
+                        {% else %}
+                            <small class="text-secondary" style="font-size: 0.8rem;">No posts yet</small>
+                        {% endif %}
+                    {% endwith %}
+
+                    <a href="{% url 'new_topic' board.id %}" class="action-btn text-white" onclick="event.stopPropagation();">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>New Thread</span>
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="threads-card text-center py-5">
+                <i class="bi bi-inbox text-secondary fs-1 mb-2"></i>
+                <h5 class="fw-bold">No boards available</h5>
+                <p class="text-secondary small mb-0">Create new boards in your Django admin to get started.</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
